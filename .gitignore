@@ -1,0 +1,4 @@
+#files da ignorare
+data/
+.project
+.settings/
