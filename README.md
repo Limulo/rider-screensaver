@@ -1,17 +1,13 @@
-#########################
-#                       #
-#  RIDER - SCREENSAVER  #
-#                       # 
-#########################
+RIDER - SCREENSAVER
 
-## DESCRIZIONE ##
-Rider è un piccolo esperimento realizzato per sperimentare con le tecnologie del Web. Il progetto è basato sull'oggetto CANVAS di HTML5. FA uso di CSS, di JavaScript e del protocollo dati JSON.
+DESCRIZIONE
+Rider è un piccolo esperimento realizzato per sperimentare con le tecnologie del Web. Il progetto è basato sull'oggetto CANVAS di HTML5. Fa uso di CSS, di JavaScript e del protocollo dati JSON.
 
-## TEAM ##
+TEAM
 - <a href="http://giovanniariutti.blogspot.it/" alt="Givanni Ariutti" target="_blank">Giovanni Ariutti</a> - per quanto riguarda la parte grafica;
 - <a href="http://www.limulo.net/it/templates/info.php" alt="Nicola Ariutti" target="_blank">Nicola Ariutti</a> - per quanto riguarda la programmazione;
 
-## NOTE ##
+NOTE
 Il progetto è un omaggio ai videogiochi anni '80, '90 cui siamo particolarmente affezionati. E' stata una occasione per studiare alcune delle tecniche che li caratterizzavano tra le quali:
 - immagini a colori indicizzati;
 - uso di pseudo-colors palettes;
