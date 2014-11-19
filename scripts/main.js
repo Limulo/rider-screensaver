@@ -1,6 +1,6 @@
 var main = (function() {
 	// la variabili sono elencate in basso!
-	
+	var bShowPalettes = true;
 	// COSTUME CLASS /////////////////////////////////////////////////////
 	//function Costume(name_, mainPal_) {
 	function Costume(dstPal_) {
@@ -190,7 +190,9 @@ var main = (function() {
 		 
 		 
 		 // DEBUG FINALE ***********************************************
-		 /*if(bShowPalettes)*/ this.debug();
+		 // le palette del costume sono mostrate almeno una volta alla
+		 // inizializzazione
+		 this.debug();
 		 //console.log(mainPal);
     } // fine della funzione INIT
 	
@@ -451,7 +453,7 @@ var main = (function() {
 			}
 		}
 		*/
-	};
+	}
 
 	// SPRITE CLASS //////////////////////////////////////////////////////
 	function Sprite (w_, h_, bType_) {
@@ -491,7 +493,7 @@ var main = (function() {
 			if(bDebug) console.log("SP: la sprite fa parte di una animazione");
 		else
 			if(bDebug) console.log("SP: la sprite è un elemento del BG o un Parallasse");
-	};
+	}
 	
 	// SPRITE OPTIMIZE //////////////////////////////////////////////////
 	Sprite.prototype.optimize = function( parentCostume ) {
@@ -540,7 +542,7 @@ var main = (function() {
 	    // per ora non implemento un metodo di display che funzioni con
 	    // ottimizzazione 2 avvenuta. Mi limito a mostrare i dati sul
 	    // numero di pixel utili, inutili e rratio a titolo di info.
-	};
+	}
 	
 	// SPRITE DISPLAY ///////////////////////////////////////////////////
 	// questo metodo ha lo scopo di aggioranre gli indici di MAINIDX
@@ -644,7 +646,7 @@ var main = (function() {
 	Sprite.prototype.debug = function() {
 		if(bDebug) console.log(this.indexes.length);
 		//if(bDebug) console.log(this.indexes);
-	};
+	}
 	
 	// ACTOR COSTRUTTORE /////////////////////////////////////////////////
 	function Actor() {
@@ -705,7 +707,7 @@ var main = (function() {
 	    this.index = 0;
 	    this.oldIndex = this.index;
 	    
-	    this.lastTime = new Date().getTime();
+	    this.lastTime = Date.now();
 	    
 	    // costruisco i due integrali che mi serviranno per :
 	    this.integrale1 = new Integrale(); // il calcolo dell'indice di sprite da mostrare;
@@ -721,7 +723,7 @@ var main = (function() {
 	// ACTOR UPDATE //////////////////////////////////////////////////////
 	Actor.prototype.update = function() {
 		// tempo trascorso dall'ultimo GAMELOOP
-	    this.actualTime = new Date().getTime();
+	    this.actualTime = Date.now();
 	    this.elapsedTime = this.actualTime - this.lastTime;
 	    this.lastTime = this.actualTime;
 	    
@@ -817,7 +819,7 @@ var main = (function() {
 
 		this.shift = 0; // (int)
 		this.dist; // (flaot) distanza del livello dal fondo	
-	};
+	}
 
 	// PARALLAX INIT /////////////////////////////////////////////////////
 	// la funzione init per la classe parallax prende come parametri
@@ -852,7 +854,7 @@ var main = (function() {
 	    this.integrale1 = new Integrale();
 	    this.integrale1.init();
 
-	    this.lastTime = new Date().getTime();
+	    this.lastTime = Date.now();
 	    
 	    if(bDebug) console.log("## PARALLAX ## --- FINE ---");
 	}
@@ -865,7 +867,7 @@ var main = (function() {
 		if(bDebug) console.log("PARALLAX - UPDATE 1: dist = "+this.dist+";");
 	    if(this.dist > 0) {
 	    	// tempo trascorso dall'ultimo GAMELOOP
-	    	this.actualTime = new Date().getTime();
+	    	this.actualTime = Date.now();
 	    	this.elapsedTime = this.actualTime - this.lastTime;
 	    	if(bDebug) console.log("PARALLAX - UPDATE 2: "+this.actualTime+", "+this.elapsedTime+", "+this.lastTime+";");
 	    	this.lastTime = this.actualTime;
@@ -990,7 +992,7 @@ var main = (function() {
 		this.integrale1.init();
 		
 		// LOGICA **********************************************************
-		this.lastTime = new Date().getTime();
+		this.lastTime = Date.now();
 		//this.secsTot = 0;
 		//this.secs = 0;
 		//this.mins = 0;
@@ -1036,7 +1038,7 @@ var main = (function() {
 	// solo la parte logica, senza intefaccia
 	Orologio.prototype.update = function() {
 		// LOGICA *********************************************************
-		this.actualTime = new Date().getTime();
+		this.actualTime = Date.now();
 		this.elapsedTime = this.actualTime - this.lastTime;
 		this.lastTime = this.actualTime;
 		//console.log("OROLOGIO - UPDATE: last: "+this.lastTime+"; actual: "+this.actualTime+"; elasped: "+this.elapsedTime+";");
@@ -1096,7 +1098,7 @@ var main = (function() {
 	// FRAMECOUNT INIT //////////////////////////////////////////////////
 	Framecount.prototype.init = function() {
 	    console.log("## FRAMECOUNT - INIT ##");
-	    this.initialTime = new Date().getTime();
+	    this.initialTime = Date.now();
 	    this.lastTime = this.initialTime;
 
 	    
@@ -1106,12 +1108,16 @@ var main = (function() {
         div.id = 'framecounter';
        	// per tutto quello che riguarda lo stile, vedere il file CSS
         div.innerHTML = html;
+        if(bShowFramecounter)
+        	div.style.display = "block";
+        else 
+        	div.style.display = "none";
         document.getElementsByTagName('body')[0].appendChild(div);
 	}
 	
 	// FRAMECOUNT UPDATE ////////////////////////////////////////////////
 	Framecount.prototype.update = function() {
-	    this.actualTime = new Date().getTime();
+	    this.actualTime = Date.now();
 	    this.elapsedTime = (this.actualTime - this.lastTime);
 
 	    if( this.elapsedTime >= 1000) {
@@ -1136,7 +1142,7 @@ var main = (function() {
 	    //printValues();
 	    
 	    // visaulizzazione sulla pagina web *****************************
-	    if( bFramecounter ) {
+	    //if( bShowFramecounter ) {
 	    	var div = document.getElementById("debug_framecount");
 	    		if(div) {
 	    			var decimaliTroncati = ( Math.round(this.avg * 1000) ) / 1000;
@@ -1147,31 +1153,11 @@ var main = (function() {
                     html += '<tr><td align="right"><b>Sec:</b></td><td align="left"><i>'+ this.lastFrames +'</i></td></tr>';
                     html += '<tr><td align="right"><b>Cur:</b></td><td align="left"><i>'+ this.currentFrame +'</i></td></tr>';
                     html += '</table>';
-                
-                    /*
-                    <table>
-                    <tr>
-                        <td colspan="2" align="right"><b>FPS</b></td>
-                    </tr>
-                    <tr>
-                        <td align="right"><b>Avg</b></td>
-                        <td align="left"><i>...</i></td>
-                    </tr>
-                    <tr>
-                        <td align="right"><b>Sec</b></td>
-                        <td align="left"><i>...</i></td>
-                    </tr>
-                    <tr>
-                        <td align="right"><b>Cur</b></td>
-                        <td align="left"><i>...</i></td>
-                    </tr>
-                    </table>
-                    */
+
                     div.innerHTML = html;
                 } // if div
-            } // if visible
+         //   } // if visible
 	}
-
 	
 	// UTILITY /////////////////////////////////////////////////////////////
 	function int(value) {
@@ -1179,6 +1165,19 @@ var main = (function() {
 		if(value >= 0)
 			return Math.floor( value );
 		return Math.ceil( value );
+	}
+	
+	function checkProgress() {
+		var p = (nImgLoaded / nImg) * 100;
+		var indicator = document.getElementsByClassName("indicator")[0];
+		indicator.style.width = p+"%";
+		//console.log("progredisco, p: "+p);
+		if( p == 100){
+			var progress = document.getElementsByClassName("progress")[0];
+			progress.style.display = "none";
+		} else {	
+			window.setTimeout(checkProgress, 30);
+		}
 	}
 	
 	// INTERPOLAZIONE /////////////////////////////////////////////////
@@ -1191,24 +1190,6 @@ var main = (function() {
 	    return value1 + amt_*(value2 - value1); // (float)
 	}
 	
-	/*
-	function loadImage(name, callback) {
-		var xhr = new XMLHttpRequest();
-		xhr.onreadystatechange = function() {
-			if(xhr.readyState === XMLHttpRequest.DONE) {
-				if(xhr.status === 200) {
-					if(callback)
-						callback( name, JSON.parse(xhr.responseText) );
-				} else {
-					if(bDebug) console.log("E'avvenuto un errore nella richiesta");
-				}
-			}
-		};
-		// carico i dati dal file JSON il cui nome è passato come parametro
-		xhr.open("GET", name, true);
-		xhr.send();
-	};
-	*/
 	function loadImage(name, callback) {
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function() {
@@ -1298,7 +1279,10 @@ var main = (function() {
 		var container = document.createElement("div");
 		container.innerHTML = "<p>"+identificativo+"</p>";
 		container.className = "palette";
-		container.style.display = "none";
+		if(bShowPalettes)
+			container.style.display = "block";
+		else
+			container.style.display = "none";
 		container.id = identificativo;
 		document.body.appendChild(container);
 		for(var e=0; e<refPal.nColors; e++) {
@@ -1314,6 +1298,7 @@ var main = (function() {
 	}
 	
 	displayPalette = function(identificativo, refPal) {
+		//console.log("displayPalette chiamata. bShowPalette è :"+bShowPalettes)
 		//console.log("## UTILITY: display Palette ##");
 		var palette = document.getElementById( identificativo );
 		//console.log(palette);
@@ -1324,7 +1309,9 @@ var main = (function() {
 		}
 	}
 	
-	showPalette = function() {
+	
+	// funzioni chiamabili da console per mostrare alcune utilità per il debug
+	showPalettes = function() {
 		bShowPalettes = !bShowPalettes;
 		//console.log(bShowPalettes);
 		var palettes = document.getElementsByClassName("palette");
@@ -1337,14 +1324,29 @@ var main = (function() {
 	}
 	
 	showFramecounter = function() {
-		bFramecounter = !bFramecounter;
+		bShowFramecounter = !bShowFramecounter;
 		var tab = document.getElementById("framecounter");
-		if(bFramecounter)
+		if(bShowFramecounter)
 			tab.style.display = "block";
 		else 
 			tab.style.display = "none";
-		
 	}
+	
+	// questa funzione viene chiamata ogni volta che avviene un ridimensionamento della finestra del browser
+	windowResize = function() {
+		var gc = document.getElementById("game-container");
+		gc.style.height = (window.innerHeight - ((window.innerHeight - dstH)/2) )+"px";
+		gc.style.width = window.innerWidth+"px";
+		/*canvasTopX = ((window.innerWidth - dstW) / 2);
+		canvasTopY = ((window.innerHeight - dstH) / 2);
+		if( canvasTopX < 0) canvasTopX = 0;
+		if( canvasTopY < 0) canvasTopY = 0;
+		console.log("window resized ---> inner Dims ("+window.innerWidth+", "+window.innerHeight+"), canvas Dims ("+dstW+", "+dstH+"), x/y ("+canvasTopX+", "+canvasTopY+")");
+		canvas.style.left = canvasTopX+"px";
+		canvas.style.top = canvasTopY+"px";
+		*/
+	}
+	
 	
 	// VARIABILI VARIE ///////////////////////////////////////////////////
 	// per fare debug e mostrare mesaggi a console
@@ -1357,6 +1359,8 @@ var main = (function() {
 	// per il canvas e relativi
 	var canvas, ctx;
 	var dstW, dstH;
+	var canvasTopX = 0; 
+	var canvasTopY = 0;
 	
 	// per il funzionamento del gioco
 	// LOGICA *********************************************************
@@ -1383,26 +1387,81 @@ var main = (function() {
 	
 	// INTERFACCIA GRAFICA ***********************************************
 	var factor = 2;
-	var bShowPalettes = true;
-	var bFramecounter = true;
+	var bShowPalettes = false;
+	var bShowFramecounter = false;
 
 	// INIT //////////////////////////////////////////////////////////////
 	var init = function() {
+		// collega all'evento RESIZE la funzione corrispondente
+		window.addEventListener("resize", function() {
+			windowResize();
+		}, false);
+		
+		if( !window.requestAnimationFrame ) {
+			alert("Sorry! your browser doesn't sopport 'requestAnimationFrame' technology :(\nTry Firefox instead!");
+			return;
+			//window.requestAnimationFrame = function(callbak) { return window.setTimeout( function(){ callback(Date.now() - startTime); }, 1000/60  ); };
+		}
+		/*
+		// polyfill per requestAnimationFrame ****************************
+		window.requestAnimationFrame = (function() {
+			var startTime = Date.now();
+			return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function( callbak ) {
+				   		return window.setTimeout( function() { callback(Date.now() - startTime); }, 1000/60  );
+				   };
+		})();
+		*/
+		
+		
 		
 		// CANVAS e IMAGE DATAs ******************************************
 		dstW = imgW * factor;
 		dstH = imgH * factor;
 		console.log("DIMENSIONI DSTIMG: "+dstW+", "+dstH+";");
 		canvas = document.createElement("canvas");
+		if( !canvas.getContext ) {
+			alert("Sorry! your browser doesn't sopport 'canvas' technology :(\nTry Firefox instead!");
+			return;
+		}
 		ctx = canvas.getContext("2d");
 		canvas.id = "game";
 		canvas.innerHTML = "your browser doesn't support CANVAS element";
 		canvas.width = dstW;
 		canvas.height = dstH;
-		var div = document.getElementsByTagName("div")[0];
+		//canvas.style.position = "fixed";
+		// vedi la funzione windowResize() per capire quali sono i valori per "top" e "left"
+		
+		// chiama la funzione che si occupa di posizionare gli elementi all'interno
+		// della finestra del browser
+		windowResize();
+
+		var div = document.getElementById("game-container");
 		div.appendChild(canvas);
-		//dstImg = ctx.createImageData(dstW, dstH);
-		dstImg = ctx.getImageData(0, 0, dstW, dstH);
+		if( !ctx.createImageData ) {
+			alert("Sorry! your browser doesn't sopport 'createImageData' technology :(\nTry Firefox instead!");
+			return;
+		}
+		dstImg = ctx.createImageData(dstW, dstH);
+		// dal momento che la una immagine creata con CREATE IMAGE DATA
+		// ha tutti i valori ALPHA per i suoi pixels settati a opacità 0
+		// devo provvedere a modificarli affinchè l'imagine finale possa 
+		// essere visibile
+		for(var y=0; y < dstH; y++) {
+			for(var x=0; x < dstW; x++) {				
+				dstIdx = x+y*dstW;
+				//dstImg.data[ dstIdx*4 + 0 ] = r;
+				//dstImg.data[ dstIdx*4 + 1 ] = g;
+				//dstImg.data[ dstIdx*4 + 2 ] = b;
+				dstImg.data[ dstIdx*4 + 3 ] = 255;
+			}
+		}
+		
+		var progress = document.createElement("div");
+		progress.className = "progress";
+		progress.innerHTML = '<div class="indicator"></div>';
+		div.appendChild(progress);
+		
+		
 
 		// CALCOLI VARI **************************************************
 		velCam = int(velFactor * velActor);
@@ -1442,12 +1501,14 @@ var main = (function() {
 		framcounter.init();
 		
 		console.log("INIZIALIZZAZIONE");
-		loadImgFromJson("data/00_orari2.json", setup);
-		loadImgFromJson("data/01.json");
-		loadImgFromJson("data/02.json");
-		loadImgFromJson("data/03.json");
+		loadImgFromJson("data/00_orari2.json" );
+		loadImgFromJson("data/01_orari.json", setup );
+		loadImgFromJson("data/02_orari.json"); 
+		loadImgFromJson("data/03_orari.json");
 		//loadImgFromJson("data/sovra.json" );
 		loadImgFromJson("data/spritesheet.json");
+		checkProgress();
+		
 	}
 	
 	
@@ -1461,15 +1522,15 @@ var main = (function() {
 		mainPal.setNextFreeColor(0, 0, 249);
 		
 		livelli.push( new Parallax() );
-		livelli[1].init("data/01.json", imgCache["data/01.json"], imgW, imgH, 0.25, parallassePos, mainPal);
+		livelli[1].init("data/01_orari.json", imgCache["data/01_orari.json"], imgW, imgH, 0.25, parallassePos, mainPal);
 		mainPal.setNextFreeColor(0, 0, 249);
 		
 		livelli.push( new Parallax() );
-		livelli[2].init("data/02.json", imgCache["data/02.json"], imgW, imgH, 0.5, parallassePos, mainPal);
+		livelli[2].init("data/02_orari.json", imgCache["data/02_orari.json"], imgW, imgH, 0.5, parallassePos, mainPal);
 		mainPal.setNextFreeColor(0, 0, 249);
 		
 		livelli.push( new Parallax() );
-		livelli[3].init("data/03.json", imgCache["data/03.json"], imgW, imgH, 1, parallassePos, mainPal);
+		livelli[3].init("data/03_orari.json", imgCache["data/03_orari.json"], imgW, imgH, 1, parallassePos, mainPal);
 		mainPal.setNextFreeColor(0, 0, 249);
 		
 		//var quintePos = [0, 140];
@@ -1504,7 +1565,6 @@ var main = (function() {
 		    livelli[j].update();
 		}
 		cavaliere.update();
-		//frameC.update();
 
 		// PALETTE SHIFTING *********************************************
 		for (var j=0; j<livelli.length; j++) {
@@ -1521,7 +1581,7 @@ var main = (function() {
 	// DRAW //////////////////////////////////////////////////////////////
 	function draw() {			
 		// PULIZIA *******************************************************
-		var entry = 1;
+		var entry = 255;
 		clear( entry );
 
 		// PARALLASSE POSTERIORI ****************************************
@@ -1545,6 +1605,13 @@ var main = (function() {
 		if(bShowPalettes) displayPalette("mainPal", mainPal);
 		window.requestAnimationFrame(update);
 	}
+	
+	
+	
+	
+	
+	
+	
 	
 	// CLEAR //////////////////////////////////////////////////////////
 	//void clear( int[] indexes, int idxEntry ) {
@@ -1585,16 +1652,15 @@ var main = (function() {
 				dstImg.data[ dstIdx*4 + 0 ] = r;
 				dstImg.data[ dstIdx*4 + 1 ] = g;
 				dstImg.data[ dstIdx*4 + 2 ] = b;
-				dstImg.data[ dstIdx*4 + 3 ] = 255;
+				//dstImg.data[ dstIdx*4 + 3 ] = 255;
 			}
 		}
 		//dstImg.updatePixels();
-		//image(dstImg_, 0, 0);
 	  	ctx.putImageData(dstImg, 0, 0, 0, 0, dstW, dstH);
 	}
 
 	return {
-		init : init,
-		showPalette : showPalette
+		init : init
 	};
+	
 })();
