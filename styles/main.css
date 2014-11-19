@@ -84,3 +84,14 @@ canvas {
 	height: 100%;
 	width: 0%;
 }
+
+.credits {
+	color: rgb(100, 100, 100);
+	font-family: "Courier", sans-serif;
+	font-size: 0.7em;
+	padding: 1em;
+}
+
+a {
+	text-decoration: none;
+}
