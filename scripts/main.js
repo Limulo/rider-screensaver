@@ -3,15 +3,16 @@ var main = (function() {
 	var bShowPalettes = true;
 	// COSTUME CLASS /////////////////////////////////////////////////////
 	//function Costume(name_, mainPal_) {
-	function Costume(dstPal_) {
+	function Costume(/*dstPal_*/) {
+		if(bDebug) console.log("## COSTUME COSTRUTTORE ##");
 		this.fileName;
-		this.dstPal = dstPal_;
+		//this.dstPal = dstPal_;
 		// dimensioni dell'immagine caricata via JSON
 		this.w, this.h;
 		// Numero di palette per il costume. Di default il numero di palette è 1
 		// ma puo' essere un numero maggiore se si tratta di un JSON pensato per
 		// implementare un PALETTE SHIFTING
-		this.pals = new Array(); // array che contiene le varie palettes
+		this.pals; // = []; // array che contiene le varie palettes
 		// numero di palette dell'immagine
 		this.nPals;
 		// il colore chiave di default ha indice 0 nelle PALETTEs
@@ -32,7 +33,7 @@ var main = (function() {
 		// del file spritesheet
 		this.sprites = new Array();
 		this.nSprites;
-		this.wSprite = 349;
+		this.wSprite;
 		// animationTime è un valore di tempo espresso in millisecondi
 		// ottenuto direttamente da uno specifico campo del files
 		// JSON. Se il JSON descrive uno spritesheet, che conta piu'
@@ -52,12 +53,12 @@ var main = (function() {
 	};
 		
 	// COSTUME INIT //////////////////////////////////////////////////////
-	Costume.prototype.init = function(name_, jsonFile) {
+	Costume.prototype.init = function(name_, jsonFile, dstPal_) {
 		this.fileName = name_;
-		if(bDebug) console.log("## COSTUME - init ("+this.fileName+") ##");
+		if(bDebug) console.log("## COSTUME INIT ("+this.fileName+") ##");
 		// supporti per l'estrazione dei dati dal file JSON
 			
-		if(bDebug) console.log("IL COLORE CHIAVE E': "+this.idxChiave);
+		if(bDebug) console.log("COST: il colore chiave è: "+this.idxChiave);
 			
 		if(bDebug) console.log("COST: l'array descritto dal file JSON caricato contiene "+jsonFile.length+" elemento." );
 		// W e H per lo SPRITESHEET ***********************************
@@ -73,8 +74,7 @@ var main = (function() {
 		} else {
 			if(bDebug) console.log("COST: il file JSON descrive solo "+this.nSprites+" immagine;");
 		}
-	
-		//sprites = new Sprite[nSprites];
+		this.sprites = new Array( this.nSprites );
 		    
 		// Animation TIME *********************************************
 		// la durata del ciclo di animazione espressa in millisecondi
@@ -96,7 +96,7 @@ var main = (function() {
 		this.nPals = jsonPals.length;
 		// ecco l'array delle palette locali LOCPAL per il COSTUME
 		// esse veranno popolate poco piu' in basso.
-		//this.pals = new Array(); //pals = new Palette[nPals];
+		this.pals = new Array( this.nPals ); //pals = new Palette[nPals];
 			
 		// PALETTE ENTRIES ********************************************
 		// devo popolare le PALETTEs LOCALI con le COLOR ENTRIES
@@ -107,7 +107,7 @@ var main = (function() {
 		// check 2 ****************************************************
 		if(bDebug) console.log("COST: l'immagine contiene "+this.nPals+" palettes da "+this.nC+" colori ciascuna (compresa la chiave)");
 		var nColors = -1;
-		this.pals;
+		//this.pals;
 		for(var ip=0; ip<this.nPals; ip++) {
 			var jsonPalette = jsonPals[ip];
 			nColors = jsonPalette.length;
@@ -133,17 +133,20 @@ var main = (function() {
 				newLocalPalette.setNextFreeColor(red, green, blue);
 			}
 		    newLocalPalette.debug(); // per debug
-		    this.pals.push( newLocalPalette );
+		    
+		    //this.pals.push( newLocalPalette );
+		    
+		    this.pals[ip] = newLocalPalette;
 		    
 		    var paletteIdentifier = "";
 		    paletteIdentifier += this.fileName+"_"+ip;
-		    createPaletteContainer(paletteIdentifier, this.pals[ip]);
+		    interfaceCreatePaletteContainer(paletteIdentifier, this.pals[ip]);
 		 }
 		 		
 		 // TRASFERIMENTO della LOCPAL alla MAINPAL ********************
 		 // al momento viene trasferita nella MAINPAL solo la palette di 
 		 // indice 0, la prima di quelle che il COST possiede
-		 this.paletteOffset = this.pals[0].transferTo( this.dstPal );
+		 this.paletteOffset = this.pals[0].transferTo( dstPal_ );
 		 if(bDebug) console.log("COST: al termine del trasferimento posso referenziare i colori in palette grazie a 'paletteOffset' = "+this.paletteOffset+";");
 		
 		 // SPRITES ****************************************************
@@ -154,8 +157,10 @@ var main = (function() {
 		 for(var is=0; is<this.nSprites; is++) {
 			 var newSprite = new Sprite( this.wSprite, this.hSprite, bAnimation);
 			 newSprite.init();
-			 this.sprites.push( newSprite );
-			 this.sprites[is].debug();
+			 newSprite.debug();
+			 
+			 //this.sprites.push( newSprite );
+			 this.sprites[is] = newSprite; 
 		 }
 		 
 		 // SPRITE IDX *************************************************
@@ -178,7 +183,7 @@ var main = (function() {
 		    }
 		 }
 		 if(bDebug) console.log("QUI SOTTO tutte le sprite del COST corrente");
-		 console.log(this.sprites);
+		 if(bDebug) console.log(this.sprites);
 		 
 		 
 		 // OTTIMIZZAZIONE per le SPRITEs ******************************
@@ -192,7 +197,7 @@ var main = (function() {
 		 // DEBUG FINALE ***********************************************
 		 // le palette del costume sono mostrate almeno una volta alla
 		 // inizializzazione
-		 this.debug();
+		 //this.interfaceDebug();
 		 //console.log(mainPal);
     } // fine della funzione INIT
 	
@@ -204,7 +209,8 @@ var main = (function() {
 	// - dimensioni dell'immagine di destinazione
 	//void display(int[] indexes_, int is_, int x_, int y_, int direction_, int dstW_, int dstH_) {
 	Costume.prototype.display = function (indexes_, is_, x_, y_, direction_, dstW_, dstH_) {
-		if(bDebug) console.log("COST - DISPLAY: is: "+is_+", x/y ("+x_+", "+y_+"), dir: "+direction_+", dstW/H ("+dstW_+", "+dstH_+");");
+		if(bDebug) console.log("COST - DISPLAY");
+		//if(bDebug) console.log("is: "+is_+", x/y ("+x_+", "+y_+"), dir: "+direction_+", dstW/H ("+dstW_+", "+dstH_+");");
 		// alla sprite passo un riferimento al costume corrente, suo PARENT
 	    this.sprites[ is_ ].display(indexes_, this.paletteOffset, this, x_, y_, direction_, dstW_, dstH_);
 	}
@@ -214,16 +220,13 @@ var main = (function() {
 	Costume.prototype.shiftPalette = function( amt0to1_ /*float*/, dstPal_ ) {
 	    // 0 <= 'amt0to1_' < 1 (NOTA: per come è pensata la logica seguente
 	    // deve essere che il valore passato come parametro a questa 
-	    // funzione vari da 0 a 1 con 1 non compreso.
+	    // funzione vari da 0 a 1 con 1 non compreso).
 	    
 	    // da questo ricavo un valore 'amt' che varia da 0 a range
 	    // ricordiamo quindi che 0 <= amt < ragne (range non compreso)
 	    // su base del quale individuo gli indici delle 
 	    // SHADOW PALETTEs tra cui deve avvenire l'interpolazione
 	    
-	    // innanzi tutto un controllo per vedere se le eventuali palette 
-	    // passate come shadow contengono lo stesso numero di colori rispetto
-	    // alla palette di destinazione (this)
 	    var range = this.nPals; // (int)
 	    // ha senso fare calcoli sullo shift della palette solo se ne esiste
 	    // piu' di una per la sprite corrente, tra le quali si possa shiftare i colori
@@ -243,6 +246,7 @@ var main = (function() {
 	    	//debugger.print("among: "+nf(amongAmount, 2, 3)+"; ");
 	    	//debugger.println("LOW: "+idxL+"; HIGH: "+idxH+";");
 	      
+    		//console.log("amt0to1: "+amt0to1_.toFixed(3)+"; amtInRange: "+amt.toFixed(3)+"; among: "+amongAmount.toFixed(3)+"; LOW: "+this.idxL+" ---> HIGH: "+this.idxH+";");
 	    	// il colore chiave deve trovarsi in posizione 0 (enty 0
 	    	// in tutte le palette locali perchè valga questo ragionamento)
 	    	var rL, gL, bL;
@@ -252,17 +256,19 @@ var main = (function() {
 	    	for(var e=1; e< this.nC; e++) {
 	        
 	    		// i dati sul colore con indice LOW
-	    		rL = int( this.pals[ this.idxL ].colors[e][0] );
-	    		gL = int( this.pals[ this.idxL ].colors[e][1] );
-	    		bL = int( this.pals[ this.idxL ].colors[e][2] );
+	    		rL = this.pals[ this.idxL ].colors[e][0] ;
+	    		gL = this.pals[ this.idxL ].colors[e][1] ;
+	    		bL = this.pals[ this.idxL ].colors[e][2] ;
 	        
 	    		// i dati sul colore con indice HIGH
-	    		rH = int( this.pals[ this.idxH ].colors[e][0] );
-	    		gH = int( this.pals[ this.idxH ].colors[e][1] );
-	    		bH = int( this.pals[ this.idxH ].colors[e][2] );
+	    		rH = this.pals[ this.idxH ].colors[e][0] ;
+	    		gH = this.pals[ this.idxH ].colors[e][1] ;
+	    		bH = this.pals[ this.idxH ].colors[e][2] ;
 	        
 	        	// i dati sul colore ottenuto per interpolazione
 	    		// LINEAR INTERPOLATION è una funzione del gruppo UTILITY FUNCs
+	    		// la conversione a INT è necessaria per poter assegnare il colore
+	    		// come valore CSS per le varie entry della palette nell'interfaccia
 	    		rI = int( linearInterpolation( amongAmount, rL, rH) );
 	    		gI = int( linearInterpolation( amongAmount, gL, gH) );
 	    		bI = int( linearInterpolation( amongAmount, bL, bH) );
@@ -299,35 +305,47 @@ var main = (function() {
     }
     
     // COSTUME DEBUG /////////////////////////////////////////////////////
-    Costume.prototype.debug = function() {
+    Costume.prototype.interfaceDebug = function() {
     	//console.log("COST: debug per COSTUME");
     	for(var ip=0; ip<this.nPals; ip++) {
+    		//l'identificativo della palette è creato a partire dal nome del
+    		// file json dell'attore in cui le palettes sono descritte
     		var idPalette = this.fileName+"_"+ip;
+    		
+    		// marchiamo il contorno delle palette che shiftano
+    		if(ip == this.idxL)
+    			document.getElementById( idPalette ).style.border = "2px solid rgb(0, 255, 0)";
+    		else if(ip == this.idxH)
+    			document.getElementById( idPalette ).style.border = "2px solid rgb(255, 0, 0)";
+    		else
+    			document.getElementById( idPalette).style.border = "2px solid rgb(0, 0, 0)";
+    		
     		//console.log("identificativo della palete da mostrare: "+idPalette)
-    		displayPalette(idPalette, this.pals[ip] );
+    		
+    		//mostriamo i colori della palette a schermo
+    		interfaceDisplayPalette(idPalette, this.pals[ip] );
     	}
     };
 
 	// PALETTE CLASS /////////////////////////////////////////////////////
 	function Palette(nColors_, chiave_) {
-		if(bDebug) console.log("## PALETTE - constructor##");
-		if(bDebug) console.log("mi vengono passati i valori nColors: "+nColors_+"; chiave: "+chiave_+";");
-		// i colori della palette
-		this.colors = new Array(); //int colors[][];
+		if(bDebug) console.log("## PALETTE CONSTRUCTOR ##");
+		if(bDebug) console.log("PAL: mi vengono passati i valori nColors: "+nColors_+"; chiave: "+chiave_+";");
 		// numero di colori nella palette
 		this.nColors = nColors_; //int nColors;
+		// i colori della palette
+		this.colors = new Array(this.nColors); //int colors[][];
 		// indice del colore di chiave nelal palette
 		this.chiave = chiave_; //int chiave; //=3
 		// indice del primo colore libero su cui 
 		// poter copiare dati da altr palette
 		this.nextFreeEntry = 0; //int nextFreeEntry; 
-		if(bDebug) console.log("nColors: "+this.nColors+"; chiave: "+this.chiave+";");
 	};
 
 	// PALETTE INIT //////////////////////////////////////////////////////
 	Palette.prototype.init = function(){
-		if(bDebug) console.log("## PALETTE - init ##");
-		if(bDebug) console.log("nColors: "+this.nColors+"; chiave: "+this.chiave+";");
+		if(bDebug) console.log("## PALETTE INIT ##");
+		//if(bDebug) console.log("nColors: "+this.nColors+"; chiave: "+this.chiave+";");
 		// inizializzo la palette
 		this.reset();
 		//this.debug();
@@ -339,32 +357,42 @@ var main = (function() {
 	// vengono inizializzate ad un colore uniforme mentre il puntatore
 	// "nextFreeEntry" viene riportato all'inizio della palette
 	Palette.prototype.reset = function(){
-		if(bDebug) console.log("PAL: reset di tutte le entries della palette");
-		var color = [0, 0, 0];
+		if(bDebug) console.log("PAL RESET: reset di tutte le entries della palette");
+		//var color = [0, 0, 0];
 		for(var e=0; e<this.nColors; e++) {
-			this.colors.push( color );
+			this.colors[e] = new Array(3);
+			this.colors[e][0] = 0;
+			this.colors[e][1] = 0;
+			this.colors[e][2] = 0;
+			//this.colors.push( color );
 		}
 		this.nextFreeEntry = 0;
-		if(bDebug) console.log("nextFreeEntry ora e' "+this.nextFreeEntry+";");
+		if(bDebug) console.log("\tnextFreeEntry ora e' "+this.nextFreeEntry+";");
 	}
 		
 	// PALETTE SET NEXT FREE COLOR ///////////////////////////////////////
 	Palette.prototype.setNextFreeColor = function(r_, g_, b_) {
+		if(bDebug) console.log("PAL SET NEXT FREE COLOR");
 		// nextFreeEntry è settato a negativo se l'intera palette 
 		// da colors.length colori è stata riempita completamente. 
 		if(this.nextFreeEntry >= 0) {
-			var newColor = [r_, g_, b_];
-			if(bDebug) console.log("il nuovo colore da aggiungere è ["+newColor+"]");
-			this.colors.splice(this.nextFreeEntry, 1, newColor);
+			//var newColor = [r_, g_, b_];
+			if(bDebug) console.log("PAL: il nuovo colore da aggiungere è ("+r_+", "+g_+","+b_+")");
+			
+			//this.colors.splice(this.nextFreeEntry, 1, newColor);
+			this.colors[ this.nextFreeEntry ][0] = r_;
+			this.colors[ this.nextFreeEntry ][1] = g_;
+			this.colors[ this.nextFreeEntry ][2] = b_;
+				
 			this.nextFreeEntry ++;
 			// il colore appena settato era l'ultimo allora imposto 
 			// nextFreeEntry a un valore negativo per evitare ulteriori
 			// settaggi di colore tramite questo metodo
 			if (this.nextFreeEntry > this.nColors-1) 
 				this.nextFreeEntry = -1;
-			if(bDebug) console.log("nextFreeEntry ora e' "+this.nextFreeEntry+";");
+			if(bDebug) console.log("\tnextFreeEntry ora e' "+this.nextFreeEntry+";");
 		} else {
-			if(bDebug) console.log("impossibile settare il nuovo colore, non sono disponibili spazi liberi!");
+			if(bDebug) console.log("PAL: impossibile settare il nuovo colore, non sono disponibili spazi liberi!");
 			if(bDebug) console.log("\tnel caso resettare la palette.");
 		}
 	}
@@ -377,16 +405,17 @@ var main = (function() {
 	// Questo metodo è usato durante il PALETTE SHIFTING
 	//void setColor(int e_, int r_, int g_, int b_) {
 	Palette.prototype.setColor = function(e_, r_, g_, b_) {
+		if(bDebug) console.log("PAL SET COLOR");
 	    // solo se l'indice è interno alla palette
 	    // posso settarne il colore usando 
 	    // i valori passati come parametri
 	    if( (e_>=0) && (e_<this.nColors) ) {
-	      this.colors[e_][0] = r_;
-	      this.colors[e_][1] = g_;
-	      this.colors[e_][2] = b_;
-	      //console.log("PAL - SET COLOR - entry "+e_+") setto a "+r_+", "+g_+", "+b_+";");
+	    	this.colors[e_][0] = r_;
+	    	this.colors[e_][1] = g_;
+	    	this.colors[e_][2] = b_;
+	    	if(bDebug) console.log("PAL: entry "+e_+") setto a "+r_+", "+g_+", "+b_+";");
 	    } else {
-	      //console.log("PAL - SET COLOR: il colore che si cerca di settare ha un indice non interno alla palette");
+	    	if(bDebug) console.log("PAL: il colore che si cerca di settare ha un indice non interno alla palette");
 	    }
 	}
 	
@@ -401,7 +430,7 @@ var main = (function() {
 	// siano opportunamente incrementati di OFFSET per referenziare
 	// il colore corretto nella MAINPAL.
 	Palette.prototype.transferTo = function(dst) { //function(Palette dst) {
-		if(bDebug) console.log("PAL: transfer dei colori dalla LOCPAL alla DSTPAL");
+		if(bDebug) console.log("PAL TRANSFER TO: transfer dei colori dalla LOCPAL alla DSTPAL");
 	    // salvo in nf l'indice della primissima
 	    // entry della destination palette ad essere vuota 
 	    // e quindi disponibile per essere sovrascritta
@@ -423,10 +452,16 @@ var main = (function() {
 	    		// non ha senso conservare il colore di chiave
 	    		if(e != this.chiave ) {
 	    			if(bDebug) console.log("NON e' il colore di chiave - procedo con la copia");
-	    			//dst.colors[ dst.nextFreeEntry ][0] = this.colors[e][0];
-	    			//dst.colors[ dst.nextFreeEntry ][1] = this.colors[e][1];
-	    			//dst.colors[ dst.nextFreeEntry ][2] = this.colors[e][2];
-	    			dst.colors[ dst.nextFreeEntry ]= this.colors[e];
+	    			// ATTENZIONE: occorre che i valori della LOCPAL vengano trasferiti
+	    			// alla DSTPAL per VALORE e non per riferimento per cui
+	    			// l'operazione va svolta così
+	    			dst.colors[ dst.nextFreeEntry ][0] = this.colors[e][0];
+	    			dst.colors[ dst.nextFreeEntry ][1] = this.colors[e][1];
+	    			dst.colors[ dst.nextFreeEntry ][2] = this.colors[e][2];
+	    			// e non in quest'altro modo. Perchè così facendo avrei 
+	    			// semplicemente creato que riferimenti allo stesso valore
+	    			//dst.colors[ dst.nextFreeEntry ] = this.colors[e]; 
+	    			
 	    			//console.log("PAL: l'entry "+e+" ("+this.colors[e][0]+", "+this.colors[e][1]+", "+this.colors[e][2]+") viene copiata nella DSTPAL in posizione "+dst.nextFreeEntry+";");
 	    			if(bDebug) console.log("PAL: l'entry "+e+" ("+this.colors[e]+") viene copiata nella DSTPAL in posizione "+dst.nextFreeEntry+";");
 	    			dst.nextFreeEntry ++;
@@ -457,10 +492,10 @@ var main = (function() {
 
 	// SPRITE CLASS //////////////////////////////////////////////////////
 	function Sprite (w_, h_, bType_) {
-		if(bDebug) console.log("## SPRITE - costruttore ##");
+		if(bDebug) console.log("## SPRITE COSTRUTTORE ##");
 		this.w = w_;
 		this.h = h_;
-		this.indexes = []; // new Array();
+		this.indexes = new Array(this.w * this.h); // new Array();
 		this.bXFlip = false;
 		this.bYFlip = false;
 		// coordinate ottimizzate per determinare il bounding box minimo.
@@ -479,14 +514,15 @@ var main = (function() {
 
 	// SPRITE INIT ///////////////////////////////////////////////////////
 	Sprite.prototype.init = function() {
-		if(bDebug) console.log("## SPRITE - init ##");
+		if(bDebug) console.log("## SPRITE INIT ##");
 		
 		// inizializzo tutti gli indici al valore 0 che,
 	    // quando provvederemo a standardizzare la cosa
 	    // potrebbe essere il colore di chiave
-		var length = this.w * this.h;
-		for(var i=0; i<length; i++) {
-			this.indexes.push( 0 );
+		//var length = this.w * this.h;
+		for(var i=0; i<this.indexes.length; i++) {
+			//this.indexes.push( 0 );
+			this.indexes[i] = 0;
 		}
 		if(bDebug) console.log("SP: creata una nuova Sprite "+this.w+"x"+this.h+" ("+this.indexes.length+" indici)");
 		if(this.bAnimation)
@@ -498,7 +534,7 @@ var main = (function() {
 	// SPRITE OPTIMIZE //////////////////////////////////////////////////
 	Sprite.prototype.optimize = function( parentCostume ) {
 		// ricevo il Costume parent dal quale prelevare il colore chiave.
-	    if(bDebug) console.log("SP: ottimizzazione della SPRITE");
+	    if(bDebug) console.log("SP OPTIMIZE: ottimizzazione della SPRITE");
 	    // OTTIMIZZAZIONE 1 *******************************************
 	    // posso facilmente stabilire tra quali valori (minimo e massimo) per
 	    // i 2 assi X e Y esistano all'interno della sprite pixel utili.
@@ -553,8 +589,8 @@ var main = (function() {
 	// passata alal funzione.
 	//void display(int[] mainIdx_, int offset, Costume parent, int posx, int posy, int dir, int dstW_, int dstH_) {
 	Sprite.prototype.display = function (mainIdx_, offset_, parent, posx, posy, dir, dstW_, dstH_) {
-		if(bDebug) console.log("SPRITE - DISPLAY");
-		if(bDebug) console.log(parent);
+		if(bDebug) console.log("SPRITE DISPLAY");
+		//if(bDebug) console.log(parent);
 		// faccio in modo che le coordinate x e y 
 	    // (di supporto per i cicli) si muovano solo 
 	    // tra i valori estremi del bounding box minimo
@@ -611,8 +647,7 @@ var main = (function() {
 	    } else {
 	    	// se la sprite invece non fa parte di un ciclo di animazione 
 	    	// ma rappresenta un livello di BG di tipo parallax
-	    	if(bDebug) console.log("SPRITE: min ("+this.Xmin+", "+this.Ymin+") e max ("+this.Xmax+", "+this.Ymax+")");
-	    	if(bDebug) console.log("SPRITE: posx/posy ("+posx+", "+posy+"), sprite Width: "+this.w+";");
+	    	if(bDebug) console.log("SPRITE: ul-corner("+this.Xmin+", "+this.Ymin+") e br-corner("+this.Xmax+", "+this.Ymax+"), posx/posy("+posx+", "+posy+"), sprite Width: "+this.w+";");
 	    	for (var y=this.Ymin; y<=this.Ymax; y++) {
 	    		//for (int y=0; y<dstH_; y++) { // se si vuole l'affinacamento verticale
 	    		for (var x=0; x<dstW_; x++) {
@@ -650,6 +685,7 @@ var main = (function() {
 	
 	// ACTOR COSTRUTTORE /////////////////////////////////////////////////
 	function Actor() {
+		if(bDebug) console.log("## ACTOR COSTRUTTORE ##");
 		// le dimensioni dell'immagine di destinazione
 		this.dstW, this.dstH;
 		this.cost;
@@ -689,9 +725,9 @@ var main = (function() {
 	    if(bDebug) console.log("\n## ACTOR ## ");
 	    if(bDebug) console.log("## Inizializzazione dell Actor ##");
 	    
-	    this.cost = new Costume(mainPal_);
+	    this.cost = new Costume();
 	    //this.cost = new Costume(name_, mainPal_);
-	    this.cost.init(url_, dati_);
+	    this.cost.init(url_, dati_, mainPal_);
 	    
 	    this.dstW = dstW_;
 	    this.dstH = dstH_;
@@ -716,12 +752,13 @@ var main = (function() {
 	    this.integrale2.init();
 	    
 	    this.calcolaVelocita( this.vel );
-	    if(bDebug) console.log("## ACTOR ## --- FINE ---");
+	    if(bDebug) console.log("## ACTOR INIT - FINE ##");
 	}
 
 	
 	// ACTOR UPDATE //////////////////////////////////////////////////////
 	Actor.prototype.update = function() {
+		if(bDebug) console.log("ACTOR UPDATE");
 		// tempo trascorso dall'ultimo GAMELOOP
 	    this.actualTime = Date.now();
 	    this.elapsedTime = this.actualTime - this.lastTime;
@@ -753,11 +790,16 @@ var main = (function() {
 	// ACTOR DISPLAY /////////////////////////////////////////////////////
 	//void display(int[] mainIdx_) {
 	Actor.prototype.display = function ( mainIdx_ ) {
+		if(bDebug) console.log("ACTOR DISPLAY");
 		// facci un nuovo disegno soltanto se è necessario
 		//if( this.bRefresh ) {
 	    	this.cost.display(mainIdx_, this.index, int( this.pos[0] ), int( this.pos[1] ), this.direction, this.dstW, this.dstH);
 	    	//this.bRefresh = false;
 		//}
+	}
+	
+	Actor.prototype.interfaceDebug = function() {
+		this.cost.interfaceDebug();
 	}
 	
 	// ACTOR SHIFT PALETTE ///////////////////////////////////////////////
@@ -789,6 +831,7 @@ var main = (function() {
 	// PARALLAX COSTRUTTORE //////////////////////////////////////////////
 	// class Parallax {
 	function Parallax() {
+		if(bDebug) console.log("## PARALLAX COSTRUTTORE ##");
 		// le dimensioni dell'immagine di destinazione
 		this.dstW, this.dstH;
 		this.cost;
@@ -803,7 +846,7 @@ var main = (function() {
 		
 		// operazioni con lo spazio
 		//PVector pos;
-		this.pos = [];
+		this.pos = new Array(2);
 		
 		// Per un parallax non ha senso parlare di oldIndex.
 		// Per parallax ho solamente un'unica sprite
@@ -829,7 +872,7 @@ var main = (function() {
 	// Actor.prototype.init = function(url_, dati_, dstW_, dstH_, pos_, mainPal_) {
 	//Parallax(url_, dati_, dstW_, dstH_, dist_, pos_, mainPal_) {
 	Parallax.prototype.init = function (url_, dati_, dstW_, dstH_, dist_, pos_, mainPal_) {
-		if(bDebug) console.log("## PARALLAX - init ## ");
+		if(bDebug) console.log("## PARALLAX INIT ## ");
 	    
 	    this.dstW = dstW_;
 	    this.dstH = dstH_;
@@ -838,9 +881,9 @@ var main = (function() {
 	    // la distanza del parallax dal piano di fondo
 	    this.dist = dist_;
 	      
-	    this.cost = new Costume(mainPal_);
+	    this.cost = new Costume();
 	    //cost = new Costume(name_, mainPal_);
-	    this.cost.init(url_, dati_);
+	    this.cost.init(url_, dati_, mainPal_);
 	    
 	    // ottienei informazioni dal COST
 	    this.T = this.cost.getT(); // ottieni da costume il valore di tempo per l'animazione
@@ -856,7 +899,7 @@ var main = (function() {
 
 	    this.lastTime = Date.now();
 	    
-	    if(bDebug) console.log("## PARALLAX ## --- FINE ---");
+	    if(bDebug) console.log("## PARALLAX INIT FINE ##");
 	}
 
 	// PARALLAX UPDATE ///////////////////////////////////////////////////
@@ -864,12 +907,13 @@ var main = (function() {
 	    // faccio l'update solo per quei livelli di parallasse che si trovano
 	    // distanti dal piano di fondo, il quale, non muovendosi affatto
 	    // non ha bisogno che venga fatto alcun calcolo per lui
-		if(bDebug) console.log("PARALLAX - UPDATE 1: dist = "+this.dist+";");
+		if(bDebug) console.log("PARALLAX - UPDATE");
+		if(bDebug) console.log("\t la distanza del parallasse attuale è: "+this.dist+";");
 	    if(this.dist > 0) {
 	    	// tempo trascorso dall'ultimo GAMELOOP
 	    	this.actualTime = Date.now();
 	    	this.elapsedTime = this.actualTime - this.lastTime;
-	    	if(bDebug) console.log("PARALLAX - UPDATE 2: "+this.actualTime+", "+this.elapsedTime+", "+this.lastTime+";");
+	    	//if(bDebug) console.log("PARALLAX - UPDATE 2: "+this.actualTime+", "+this.elapsedTime+", "+this.lastTime+";");
 	    	this.lastTime = this.actualTime;
 	      
 	    	var amount = (this.elapsedTime / this.T ); // (float)
@@ -883,15 +927,21 @@ var main = (function() {
 	    	this.shift %= this.wSp;
 	    	if( this.shift < 0 )
 	    		this.shift = this.wSp + this.shift;
-	    	if(bDebug) console.log("PARALLAX - UPDATE 3: wSp:"+this.wSp+", "+amount+", "+velIntera+", "+this.shift+";");
+	    	//if(bDebug) console.log("PARALLAX - UPDATE 3: wSp:"+this.wSp+", "+amount+", "+velIntera+", "+this.shift+";");
 	    }  
-	    
 	}
+	
+	
+	Parallax.prototype.interfaceDebug = function() {
+		this.cost.interfaceDebug();
+	}
+	
 	
 	// PARALLAX DISPLAY //////////////////////////////////////////////////
 	//void display(int[] mainIdx_) {
 	Parallax.prototype.display = function ( mainIdx_ ) {
-		if(bDebug) console.log("PARALLAX - DISPLAY: shift: "+this.shift+";");
+		if(bDebug) console.log("PARALLAX - DISPLAY");
+		//console.log("shift: "+this.shift+";");
 	    this.cost.display(mainIdx_, this.index, this.shift, int( this.pos[1] ), this.direction, this.dstW, this.dstH);
 	}
 	
@@ -916,12 +966,13 @@ var main = (function() {
 
 	// INTEGRALE COSTRUTTORE /////////////////////////////////////////////
 	function Integrale() {
+		if(bDebug) console.log("## INTEGRALE COSTRUTTORE ##");
 		this.cumulativo = 0.0; // (float)
 	};
 	
 	// INTEGRALE INIT ////////////////////////////////////////////////////
 	Integrale.prototype.init = function() {
-		if(bDebug) console.log("## INTEGRALE - init ##");
+		if(bDebug) console.log("## INTEGRALE INIT ##");
 		// do nothing
 	}
 
@@ -955,6 +1006,7 @@ var main = (function() {
 	
 	// OROLOGIO COSTRUTTORE //////////////////////////////////////////////
 	function Orologio() {
+		if(bDebug) console.log("## OROLOGIO COSTRUTTORE ##");
 		// classe per gestire l'orario - misurato in secondi, minuti e ore.
 		// Il tempo può scorrere in avanti o indietro nell'arco delle 24 ore.
 		// La parte grafica realizza una animazione di un quadrante con lancette
@@ -987,7 +1039,7 @@ var main = (function() {
 
 	// OROLOGIO INIT /////////////////////////////////////////////////////
 	Orologio.prototype.init = function() {
-		if(bDebug) console.log("## OROLOGIO - init ##")
+		if(bDebug) console.log("## OROLOGIO INIT ##")
 		this.integrale1 = new Integrale();
 		this.integrale1.init();
 		
@@ -1037,6 +1089,7 @@ var main = (function() {
 	// OROLOGIO UPDATE ///////////////////////////////////////////////////
 	// solo la parte logica, senza intefaccia
 	Orologio.prototype.update = function() {
+		if(bDebug) console.log("OROLOGIO UPDATE");
 		// LOGICA *********************************************************
 		this.actualTime = Date.now();
 		this.elapsedTime = this.actualTime - this.lastTime;
@@ -1058,6 +1111,7 @@ var main = (function() {
 
 	// OROLOGIO GET NORMALIZED AMOUNT ///////////////////////////////////
 	Orologio.prototype.getNormalizedAmount = function () {
+		if(bDebug) console.log("OROLOGIO GET NORMALIZED AMOUNT");
 		// mentre il tempo fluisce,
 	    // il valore ritornato è sempre un valore positivo
 	    // 0 <= NORMALIZED OUTPUT < 1 (da notare che il valore estremo
@@ -1084,6 +1138,7 @@ var main = (function() {
 	
 	// FRAMECOUNT CLASS /////////////////////////////////////////////////
 	function Framecount() {
+		if(bDebug) console.log("## FRAMECOUNT COSTRUTTORE ##");
 		this.actualTime = 0; 
 		this.elapsedTime = 0; 
 		this.lastTime = 0;
@@ -1097,7 +1152,7 @@ var main = (function() {
 	
 	// FRAMECOUNT INIT //////////////////////////////////////////////////
 	Framecount.prototype.init = function() {
-	    console.log("## FRAMECOUNT - INIT ##");
+	    if(bDebug) console.log("## FRAMECOUNT INIT ##");
 	    this.initialTime = Date.now();
 	    this.lastTime = this.initialTime;
 
@@ -1145,11 +1200,10 @@ var main = (function() {
 	    //if( bShowFramecounter ) {
 	    	var div = document.getElementById("debug_framecount");
 	    		if(div) {
-	    			var decimaliTroncati = ( Math.round(this.avg * 1000) ) / 1000;
-	    			
+	    			//var decimaliTroncati = trunc(this.avg, 3); /*( Math.round(this.avg * 1000) ) / 1000;*/
 	    			var html = '';
                     html += '<table><tr><td colspan="2" align="left"><b><u>FPS</u></b></td></tr>';
-                    html += '<tr><td align="right"><b>Avg:</b></td><td align="left"><i>'+ decimaliTroncati +'</i></td></tr>';
+                    html += '<tr><td align="right"><b>Avg:</b></td><td align="left"><i>'+ this.avg.toFixed(3) +'</i></td></tr>';
                     html += '<tr><td align="right"><b>Sec:</b></td><td align="left"><i>'+ this.lastFrames +'</i></td></tr>';
                     html += '<tr><td align="right"><b>Cur:</b></td><td align="left"><i>'+ this.currentFrame +'</i></td></tr>';
                     html += '</table>';
@@ -1180,6 +1234,12 @@ var main = (function() {
 		}
 	}
 	
+	// al posto di trunc si può usare la funzione toFixed() della classe Number()
+	function trunc(value, precision) {
+		var prec = Math.pow(10, precision);
+		return ( Math.round(value * prec) ) / prec;
+	}
+	
 	// INTERPOLAZIONE /////////////////////////////////////////////////
 	// calcolo il valore interpolato che si trova tra 'value1' e 'value2'
 	// e è un proporzione come 'amt_' rispetto a 1
@@ -1190,6 +1250,7 @@ var main = (function() {
 	    return value1 + amt_*(value2 - value1); // (float)
 	}
 	
+	/*
 	function loadImage(name, callback) {
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function() {
@@ -1205,7 +1266,9 @@ var main = (function() {
 		// carico i dati dal file JSON il cui nome è passato come parametro
 		xhr.open("GET", name, true);
 		xhr.send();
-	};
+	}
+	*/
+	
 	
 	function loadImgFromJson(src, callbackFunc) {
 		if( imgCache.hasOwnProperty(src) ) {
@@ -1239,7 +1302,7 @@ var main = (function() {
 		// carico i dati dal file JSON il cui nome è passato come parametro
 		xhr.open("GET", src, true);
 		xhr.send();
-	};
+	}
 	
 	function isReady() {
 		// ready resta vero se tutte le immagini sono state
@@ -1275,16 +1338,21 @@ var main = (function() {
 		}
 	}
 		
-	createPaletteContainer = function(identificativo, refPal) {
+	interfaceCreatePaletteContainer = function(identificativo, refPal) {
 		var container = document.createElement("div");
 		container.innerHTML = "<p>"+identificativo+"</p>";
 		container.className = "palette";
+		
+		// setto la proprietà visibile solo se la variabile booleana lo permette
 		if(bShowPalettes)
 			container.style.display = "block";
 		else
 			container.style.display = "none";
+		
 		container.id = identificativo;
 		document.body.appendChild(container);
+		
+		// creo le entry da inserire all'interno del container
 		for(var e=0; e<refPal.nColors; e++) {
 			var entry = document.createElement("div");
 			entry.className = "entry";
@@ -1292,13 +1360,15 @@ var main = (function() {
 			entry.style.backgroundColor = "rgb(0, 0, 0)";
 			container.appendChild(entry);
 		}
+		// creo il separatore in modo da chidere il DIV della palette 
+		// appean sotto alla posizione dell'ultima entry (vedi CSS)
 		var separatore = document.createElement("hr");
 		separatore.className = "clear";
 		container.appendChild(separatore);
 	}
 	
-	displayPalette = function(identificativo, refPal) {
-		//console.log("displayPalette chiamata. bShowPalette è :"+bShowPalettes)
+	interfaceDisplayPalette = function(identificativo, refPal) {
+		//console.log("interfaceDisplayPalette chiamata. bShowPalette è :"+bShowPalettes)
 		//console.log("## UTILITY: display Palette ##");
 		var palette = document.getElementById( identificativo );
 		//console.log(palette);
@@ -1332,10 +1402,17 @@ var main = (function() {
 			tab.style.display = "none";
 	}
 	
+	pauseAnimation = function() {
+		console.log("Pausa o NO");
+		bPause = !bPause;
+		if(!bPause)
+			window.requestAnimationFrame(update);
+	}
+	
 	// questa funzione viene chiamata ogni volta che avviene un ridimensionamento della finestra del browser
 	windowResize = function() {
 		var gc = document.getElementById("game-container");
-		gc.style.height = (window.innerHeight - ((window.innerHeight - dstH)/2) )+"px";
+		gc.style.height = (window.innerHeight - 2*((window.innerHeight - dstH)/3) )+"px";
 		gc.style.width = window.innerWidth+"px";
 		/*canvasTopX = ((window.innerWidth - dstW) / 2);
 		canvasTopY = ((window.innerHeight - dstH) / 2);
@@ -1346,271 +1423,6 @@ var main = (function() {
 		canvas.style.top = canvasTopY+"px";
 		*/
 	}
-	
-	
-	// VARIABILI VARIE ///////////////////////////////////////////////////
-	// per fare debug e mostrare mesaggi a console
-	var bDebug = false;
-	// per il caricamento delle risorse
-	var nImg = 0;
-	var nImgLoaded = 0;
-	var imgCache = {};
-	var callbacks = [];
-	// per il canvas e relativi
-	var canvas, ctx;
-	var dstW, dstH;
-	var canvasTopX = 0; 
-	var canvasTopY = 0;
-	
-	// per il funzionamento del gioco
-	// LOGICA *********************************************************
-	// tutto cio' che DEVE essere presente perchè tutti i meccanismi
-	// funzionino correttamente
-	var imgW = 320;
-	var imgH = 240;
-	
-	var mainPal;
-	var mainIdx = [];
-	
-	var framecounter;
-	var orologio;
-	var warpAmount = 967.574; // float
-	var warp = 2000; //2000.0; // float
-
-	var cavaliere;
-	var livelli = [];
-	
-	var velFactor = 0.95; 	// (float)
-	var velActor = -240;	// (int)
-	var velCam;				// (int)
-	var velActorApparent;	// (int)
-	
-	// INTERFACCIA GRAFICA ***********************************************
-	var factor = 2;
-	var bShowPalettes = false;
-	var bShowFramecounter = false;
-
-	// INIT //////////////////////////////////////////////////////////////
-	var init = function() {
-		// collega all'evento RESIZE la funzione corrispondente
-		window.addEventListener("resize", function() {
-			windowResize();
-		}, false);
-		
-		if( !window.requestAnimationFrame ) {
-			alert("Sorry! your browser doesn't sopport 'requestAnimationFrame' technology :(\nTry Firefox instead!");
-			return;
-			//window.requestAnimationFrame = function(callbak) { return window.setTimeout( function(){ callback(Date.now() - startTime); }, 1000/60  ); };
-		}
-		/*
-		// polyfill per requestAnimationFrame ****************************
-		window.requestAnimationFrame = (function() {
-			var startTime = Date.now();
-			return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function( callbak ) {
-				   		return window.setTimeout( function() { callback(Date.now() - startTime); }, 1000/60  );
-				   };
-		})();
-		*/
-		
-		
-		
-		// CANVAS e IMAGE DATAs ******************************************
-		dstW = imgW * factor;
-		dstH = imgH * factor;
-		console.log("DIMENSIONI DSTIMG: "+dstW+", "+dstH+";");
-		canvas = document.createElement("canvas");
-		if( !canvas.getContext ) {
-			alert("Sorry! your browser doesn't sopport 'canvas' technology :(\nTry Firefox instead!");
-			return;
-		}
-		ctx = canvas.getContext("2d");
-		canvas.id = "game";
-		canvas.innerHTML = "your browser doesn't support CANVAS element";
-		canvas.width = dstW;
-		canvas.height = dstH;
-		//canvas.style.position = "fixed";
-		// vedi la funzione windowResize() per capire quali sono i valori per "top" e "left"
-		
-		// chiama la funzione che si occupa di posizionare gli elementi all'interno
-		// della finestra del browser
-		windowResize();
-
-		var div = document.getElementById("game-container");
-		div.appendChild(canvas);
-		if( !ctx.createImageData ) {
-			alert("Sorry! your browser doesn't sopport 'createImageData' technology :(\nTry Firefox instead!");
-			return;
-		}
-		dstImg = ctx.createImageData(dstW, dstH);
-		// dal momento che la una immagine creata con CREATE IMAGE DATA
-		// ha tutti i valori ALPHA per i suoi pixels settati a opacità 0
-		// devo provvedere a modificarli affinchè l'imagine finale possa 
-		// essere visibile
-		for(var y=0; y < dstH; y++) {
-			for(var x=0; x < dstW; x++) {				
-				dstIdx = x+y*dstW;
-				//dstImg.data[ dstIdx*4 + 0 ] = r;
-				//dstImg.data[ dstIdx*4 + 1 ] = g;
-				//dstImg.data[ dstIdx*4 + 2 ] = b;
-				dstImg.data[ dstIdx*4 + 3 ] = 255;
-			}
-		}
-		
-		var progress = document.createElement("div");
-		progress.className = "progress";
-		progress.innerHTML = '<div class="indicator"></div>';
-		div.appendChild(progress);
-		
-		
-
-		// CALCOLI VARI **************************************************
-		velCam = int(velFactor * velActor);
-		velActorApparent = velActor - velCam;
-		
-		// MAIN PALETTE **************************************************
-		if (bDebug) console.log("MAINPAL - creazione delal Main Palette e inserimento delle prime entry");
-		mainPal = new Palette(256, 0);
-		mainPal.init();
-		// settare eventuali colori prima di cominciare
-		mainPal.setNextFreeColor(255, 255, 255);
-		mainPal.setNextFreeColor(0, 255, 0);
-		//mainPal.setNextFreeColor(255, 0, 0);
-		//mainPal.setNextFreeColor(0, 255, 0);
-		//mainPal.setNextFreeColor(0, 0, 255);
-		// mostro un debug prima di cominciare
-		createPaletteContainer("mainPal", mainPal);
-		//displayPalette("mainPal", mainPal);
-		//mainPal.debug();
-		
-		// MAIN INDEXES *************************************************
-		if (bDebug) console.log("MAINIDX - creazione dell'array e inizializzazione al colore chiave");
-		//mainIdx = new int[imgW * imgH];
-		for(var i=0; i<(imgW*imgH); i++) {
-			// l'indice 0 nella palette è un colore di sfondo
-			// o comunque un colore che possa essere utilizzato come puliza
-			mainIdx.push( 0 );
-		}
-		
-		// Clock *****************************************************
-		orologio = new Orologio();
-		orologio.init();
-		//console.log("questo è il valore di warp iniziale: "+warp+";");
-		orologio.setTimeWarp(warp);
-		
-		framcounter = new Framecount();
-		framcounter.init();
-		
-		console.log("INIZIALIZZAZIONE");
-		loadImgFromJson("data/00_orari2.json" );
-		loadImgFromJson("data/01_orari.json", setup );
-		loadImgFromJson("data/02_orari.json"); 
-		loadImgFromJson("data/03_orari.json");
-		//loadImgFromJson("data/sovra.json" );
-		loadImgFromJson("data/spritesheet.json");
-		checkProgress();
-		
-	}
-	
-	
-	// SETUP /////////////////////////////////////////////////////////////
-	var setup = function() {
-		
-		// BG e PARALLASSE **********************************************
-		var parallassePos = [0, 0];
-		livelli.push( new Parallax() );
-		livelli[0].init("data/00_orari2.json", imgCache["data/00_orari2.json"], imgW, imgH, 0, parallassePos, mainPal);
-		mainPal.setNextFreeColor(0, 0, 249);
-		
-		livelli.push( new Parallax() );
-		livelli[1].init("data/01_orari.json", imgCache["data/01_orari.json"], imgW, imgH, 0.25, parallassePos, mainPal);
-		mainPal.setNextFreeColor(0, 0, 249);
-		
-		livelli.push( new Parallax() );
-		livelli[2].init("data/02_orari.json", imgCache["data/02_orari.json"], imgW, imgH, 0.5, parallassePos, mainPal);
-		mainPal.setNextFreeColor(0, 0, 249);
-		
-		livelli.push( new Parallax() );
-		livelli[3].init("data/03_orari.json", imgCache["data/03_orari.json"], imgW, imgH, 1, parallassePos, mainPal);
-		mainPal.setNextFreeColor(0, 0, 249);
-		
-		//var quintePos = [0, 140];
-		//livelli.push( new Parallax() );
-		//livelli[4].init("data/sovra.json", imgCache["data/sovra.json"], imgW, imgH, 1.25, quintePos, mainPal);
-		//mainPal.setNextFreeColor(0, 0, 249);
-		
-		for (var j=0; j<livelli.length; j++) {
-			livelli[j].setVel( velCam );
-		} 
-		
-		// ATTORI *******************************************************
-		var actorPos = [160, 120];
-		cavaliere = new Actor();
-		cavaliere.init("data/spritesheet.json", imgCache["data/spritesheet.json"], imgW, imgH, actorPos, mainPal);
-		mainPal.setNextFreeColor(0, 0, 249);
-		cavaliere.setVel( velActorApparent );
-
-		//window.setInterval(update, 42);
-		window.requestAnimationFrame(update);
-		//update();
-	}
-
-	// UPDATE ////////////////////////////////////////////////////////////
-	function update() {
-		
-		framcounter.update();
-		
-		// LOGICA *******************************************************
-		orologio.update();
-		for (var j=0; j<livelli.length; j++) {
-		    livelli[j].update();
-		}
-		cavaliere.update();
-
-		// PALETTE SHIFTING *********************************************
-		for (var j=0; j<livelli.length; j++) {
-			livelli[j].shiftPalette( orologio.getNormalizedAmount() , mainPal );
-		}
-		cavaliere.shiftPalette( orologio.getNormalizedAmount() , mainPal );
-		  
-		// COLOR CYCLING ************************************************
-		// eventuali operazioni legate al color cycling
-		
-		draw();
-	}
-
-	// DRAW //////////////////////////////////////////////////////////////
-	function draw() {			
-		// PULIZIA *******************************************************
-		var entry = 255;
-		clear( entry );
-
-		// PARALLASSE POSTERIORI ****************************************
-		for (var j=0; j<livelli.length; j++) {
-		    if ( livelli[j].getDist() <= 1 ) {
-		      livelli[j].display( mainIdx );
-		    }
-		}
-		
-		// FOCUS ********************************************************
-		cavaliere.display( mainIdx );
-		
-		// LE QUINTE ****************************************************
-		for (var j=0; j<livelli.length; j++) {
-		    if ( livelli[j].getDist() > 1 ) {
-		      livelli[j].display( mainIdx );
-		    }
-		}
-		
-		displayDstImg();
-		if(bShowPalettes) displayPalette("mainPal", mainPal);
-		window.requestAnimationFrame(update);
-	}
-	
-	
-	
-	
-	
-	
 	
 	
 	// CLEAR //////////////////////////////////////////////////////////
@@ -1658,9 +1470,339 @@ var main = (function() {
 		//dstImg.updatePixels();
 	  	ctx.putImageData(dstImg, 0, 0, 0, 0, dstW, dstH);
 	}
+	
+	
+	// VARIABILI VARIE ///////////////////////////////////////////////////
+	// per fare debug e mostrare mesaggi a console
+	var bDebug = false;
+	// per il caricamento delle risorse
+	var nImg = 0;
+	var nImgLoaded = 0;
+	var imgCache = {};
+	var callbacks = [];
+	// per il canvas e relativi
+	var canvas, ctx;
+	var dstW, dstH;
+	var canvasTopX = 0; 
+	var canvasTopY = 0;
+	
+	// per il funzionamento del gioco
+	// LOGICA *********************************************************
+	// tutto cio' che DEVE essere presente perchè tutti i meccanismi
+	// funzionino correttamente
+	var imgW = 320;
+	var imgH = 240;
+	
+	var mainPal;
+	var mainIdx = new Array(imgW * imgH);
+	
+	var framecounter;
+	var orologio;
+	var warpAmount = 967.574; // float
+	var warp = 2000; //2000.0; // float
 
+	var cavaliere;
+	var livelli = [];
+	
+	var velFactor = 0.95; 	// (float)
+	var velActor = -240;	// (int)
+	var velCam;				// (int)
+	var velActorApparent;	// (int)
+	
+	// INTERFACCIA GRAFICA ***********************************************
+	var factor = 2;
+	var bShowPalettes = false;
+	var bShowFramecounter = false;
+	var bPause = false;
+
+	// INIT //////////////////////////////////////////////////////////////
+	var init = function() {
+		if(bDebug) console.log("INIT: preparo le funzioni di callback per i vari enventi");
+		// collega all'evento RESIZE la funzione corrispondente
+		window.addEventListener("resize", function() {
+			windowResize();
+		}, false);
+		
+		window.addEventListener("keydown", function(e) {
+			e.preventDefault();
+			var code = e.keyCode;
+			var key;
+			switch (code) {
+				case 32:
+					key = "SPACE";
+					pauseAnimation();
+					break;
+				case 70:
+					key = "F";
+					showFramecounter();
+					break;
+				case 80:
+					key = "P";
+					showPalettes();
+					break;
+				default:
+					key = String.fromCharCode(code);
+					console.log(code+" - "+key);
+			}
+		}, false);
+		
+		window.addEventListener("keyup", function(e) {
+			var code = e.keyCode;
+			//do nothing
+		}, false);
+		
+		if( !window.requestAnimationFrame ) {
+			alert("Sorry! your browser doesn't sopport 'requestAnimationFrame' technology :(\nTry Firefox instead!");
+			return;
+			//window.requestAnimationFrame = function(callbak) { return window.setTimeout( function(){ callback(Date.now() - startTime); }, 1000/60  ); };
+		}
+		/*
+		// polyfill per requestAnimationFrame ****************************
+		window.requestAnimationFrame = (function() {
+			var startTime = Date.now();
+			return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function( callbak ) {
+				   		return window.setTimeout( function() { callback(Date.now() - startTime); }, 1000/60  );
+				   };
+		})();
+		*/
+		
+		// CANVAS e IMAGE DATAs ******************************************
+		if(bDebug) console.log("INIT: preparo CANVAS, CONTEXT e IMAGEDATA");
+		dstW = imgW * factor;
+		dstH = imgH * factor;
+		if(bDebug) console.log("DIMENSIONI DSTIMG: "+dstW+", "+dstH+";");
+		canvas = document.createElement("canvas");
+		if( !canvas.getContext ) {
+			alert("Sorry! your browser doesn't sopport 'canvas' technology :(\nTry Firefox instead!");
+			return;
+		}
+		ctx = canvas.getContext("2d");
+		canvas.id = "game";
+		canvas.innerHTML = "your browser doesn't support CANVAS element";
+		canvas.width = dstW;
+		canvas.height = dstH;
+		
+		// chiama la funzione che si occupa di posizionare gli elementi all'interno
+		// della finestra del browser
+		windowResize();
+
+		var div = document.getElementById("game-container");
+		div.appendChild(canvas);
+		if( !ctx.createImageData ) {
+			alert("Sorry! your browser doesn't sopport 'createImageData' technology :(\nTry Firefox instead!");
+			return;
+		}
+		dstImg = ctx.createImageData(dstW, dstH);
+		// dal momento che la una immagine creata con CREATE IMAGE DATA
+		// ha tutti i valori ALPHA per i suoi pixels settati a opacità 0
+		// devo provvedere a modificarli affinchè l'imagine finale possa 
+		// essere visibile
+		for(var y=0; y < dstH; y++) {
+			for(var x=0; x < dstW; x++) {				
+				dstIdx = x+y*dstW;
+				dstImg.data[ dstIdx*4 + 3 ] = 255;
+			}
+		}
+		
+		// per visualizzare lo stato di progressione del loading risorse
+		if(bDebug) console.log("INIT: creo la barra di progressione per monitorare il caricamento delle risorse");
+		var progress = document.createElement("div");
+		progress.className = "progress";
+		progress.innerHTML = '<div class="indicator"></div>';
+		div.appendChild(progress);
+		
+		// CALCOLI VARI **************************************************
+		velCam = int(velFactor * velActor);
+		velActorApparent = velActor - velCam;
+		
+		// MAIN PALETTE **************************************************
+		if (bDebug) console.log("INIT: creo la MAINPAL");
+		mainPal = new Palette(256, 0);
+		mainPal.init();
+		// settare eventuali colori prima di cominciare
+		mainPal.setNextFreeColor(249, 0, 249);
+		// mostro un debug prima di cominciare
+		interfaceCreatePaletteContainer("mainPal", mainPal);
+		
+		// MAIN INDEXES *************************************************
+		if (bDebug) console.log("INIT: creo MAINIDX");
+		//mainIdx = new int[imgW * imgH];
+		for(var i=0; i<mainIdx.length; i++) {
+			// l'indice 0 nella palette è un colore di sfondo
+			// o comunque un colore che possa essere utilizzato come puliza
+			//mainIdx.push( 0 );
+			mainIdx[i] = 0;
+		}
+		
+		// Clock *****************************************************
+		if (bDebug) console.log("INIT: creo l'OROLOGIO");
+		orologio = new Orologio();
+		orologio.init();
+		//console.log("questo è il valore di warp iniziale: "+warp+";");
+		orologio.setTimeWarp(warp);
+		
+		if (bDebug) console.log("INIT: creo il FRAMECOUNTER");
+		framcounter = new Framecount();
+		framcounter.init();
+		
+		
+		if (bDebug) console.log("INIT: carico le risorse dai files JSON\n");
+		loadImgFromJson("data/00_orari2.json", checkProgress );
+		loadImgFromJson("data/01_orari.json", setup );
+		loadImgFromJson("data/02_orari.json"); 
+		loadImgFromJson("data/03_orari.json");
+		//loadImgFromJson("data/sovra.json" );
+		loadImgFromJson("data/spritesheet.json");
+	}
+	
+	
+	// SETUP /////////////////////////////////////////////////////////////
+	var setup = function() {
+		if (bDebug) console.log("SETUP: carico le risorse dai files JSON\n");
+		// NOTA: nel chiamare il metodo init per il PARALLASSE o p er l'ATTORE
+		// sto anche provvedendo alla creazione dei rispettivi elementi di interfaccia 
+		// quali, ad esempio, i riquadri che si occuperanno di mostrare le varie LOCPALS 
+		
+		
+		if (bDebug) console.log("SETUP: creo gli ATTORI e li inizializzo\n");
+		// BG e PARALLASSE **********************************************
+		var parallassePos = [0, 0];
+		livelli.push( new Parallax() );
+		livelli[0].init("data/00_orari2.json", imgCache["data/00_orari2.json"], imgW, imgH, 0, parallassePos, mainPal);
+		mainPal.setNextFreeColor(249, 0, 249);
+		
+		livelli.push( new Parallax() );
+		livelli[1].init("data/01_orari.json", imgCache["data/01_orari.json"], imgW, imgH, 0.25, parallassePos, mainPal);
+		mainPal.setNextFreeColor(249, 0, 249);
+		
+		livelli.push( new Parallax() );
+		livelli[2].init("data/02_orari.json", imgCache["data/02_orari.json"], imgW, imgH, 0.5, parallassePos, mainPal);
+		mainPal.setNextFreeColor(249, 0, 249);
+		
+		livelli.push( new Parallax() );
+		livelli[3].init("data/03_orari.json", imgCache["data/03_orari.json"], imgW, imgH, 1, parallassePos, mainPal);
+		mainPal.setNextFreeColor(249, 0, 249);
+		
+		//var quintePos = [0, 140];
+		//livelli.push( new Parallax() );
+		//livelli[4].init("data/sovra.json", imgCache["data/sovra.json"], imgW, imgH, 1.25, quintePos, mainPal);
+		//mainPal.setNextFreeColor(249, 0, 249);
+		
+		for (var j=0; j<livelli.length; j++) {
+			livelli[j].setVel( velCam );
+		} 
+		
+		// ATTORI *******************************************************
+		var actorPos = [160, 120];
+		cavaliere = new Actor();
+		cavaliere.init("data/spritesheet.json", imgCache["data/spritesheet.json"], imgW, imgH, actorPos, mainPal);
+		mainPal.setNextFreeColor(249, 0, 249);
+		cavaliere.setVel( velActorApparent );
+
+		//window.setInterval(update, 42);
+		//update();
+		window.requestAnimationFrame(update);
+	}
+
+	// UPDATE ////////////////////////////////////////////////////////////
+	function update() {
+		if (bDebug) console.log("UPDATE\n");
+		
+		// LOGICA *******************************************************
+		if (bDebug) console.log("UPDATE: update di framecounter, orologio e attori");
+		framcounter.update();
+		
+		if(!bPause) {
+			orologio.update();
+			for (var j=0; j<livelli.length; j++) {
+				livelli[j].update();
+			}
+			cavaliere.update();
+		}
+		
+		// PALETTE SHIFTING *********************************************
+		if(bDebug) console.log("UPDATE: operazioni di PALETTE SHIFTING\n");
+		for (var j=0; j<livelli.length; j++) {
+			livelli[j].shiftPalette( orologio.getNormalizedAmount() , mainPal );
+		}
+		cavaliere.shiftPalette( orologio.getNormalizedAmount() , mainPal );
+		  
+		//if(bDebug) console.log("UPDATE: operazioni di COLOR CYCLING\n");
+		// COLOR CYCLING ************************************************
+		// eventuali operazioni legate al color cycling
+		
+		/*
+		// debug momentaneo per capire se il primo colore utile della prima palette 
+		// del primo livello di parallasse cambia nel tempo o meno. Dovrebbe rimanere 
+		// sempre uguale a se stesso ma controlliamo
+		//var r = livelli[0].cost.pals[0].colors[1][0];
+		//var g = livelli[0].cost.pals[0].colors[1][1];
+		var mcolor = mainPal.colors[2][1];
+		var btocheck = livelli[0].cost.pals[0].colors[2][1];
+		var b1 = livelli[0].cost.pals[1].colors[2][1];
+		var b2 = livelli[0].cost.pals[2].colors[2][1];
+		var b3 = livelli[0].cost.pals[3].colors[2][1];
+		var b4 = livelli[0].cost.pals[4].colors[2][1];
+		var b5 = livelli[0].cost.pals[5].colors[2][1];
+		var b6 = livelli[0].cost.pals[6].colors[2][1];
+		var b7 = livelli[0].cost.pals[7].colors[2][1];
+		//console.log("MAIN["+mcolor+"] ---> "+btocheck+", "+b1+", "+b2+", "+b3+", "+b4+", "+b5+", "+b6+", "+b7+";");
+		*/
+		
+		draw();
+	}
+
+	// DRAW //////////////////////////////////////////////////////////////
+	function draw() {	
+		if(bDebug) console.log("DRAW\n");
+		
+		// INTERFACCIA: mostro le varie palettes **************************
+		if(bDebug) console.log("DRAW: aggiorno l'interfaccia mostrando le varie palette ed enties\n");
+		//livelli[0].cost.debug();
+		if(bShowPalettes) {
+			// mostro in interfaccia lo stato della MAIN PAL
+			interfaceDisplayPalette("mainPal", mainPal);
+			// mostro in interfaccia lo stato della LOCPALS per i vari attori
+			// anche se (IN TEORIA) le palettes locali non DEVONO cambiare nel tempo
+			for (var j=0; j<livelli.length; j++) {
+			    livelli[j].interfaceDebug();
+			}
+			cavaliere.interfaceDebug();
+		}
+		
+		// PULIZIA *******************************************************
+		if(bDebug) console.log("DRAW: clear\n");
+		// a ben vedere la pulizia non è affatto necessaria
+		//var entry = 0;
+		//clear( entry );
+
+		if(bDebug) console.log("DRAW: chiamo DISPLAY per ogni ATTORE\n");
+		// PARALLASSE POSTERIORI ****************************************
+		for (var j=0; j<livelli.length; j++) {
+		    if ( livelli[j].getDist() <= 1 ) {
+		      livelli[j].display( mainIdx );
+		    }
+		}
+		
+		// FOCUS ********************************************************
+		cavaliere.display( mainIdx );
+		
+		// LE QUINTE ****************************************************
+		for (var j=0; j<livelli.length; j++) {
+		    if ( livelli[j].getDist() > 1 ) {
+		      livelli[j].display( mainIdx );
+		    }
+		}
+		
+		if(bDebug) console.log("DRAW: visualizzo IMGDATA\n");
+		displayDstImg();
+
+		window.requestAnimationFrame(update);
+	}
+
+	
+	
 	return {
 		init : init
 	};
-	
 })();
