@@ -4,7 +4,7 @@
 Rider è un piccolo esperimento realizzato per sperimentare con le tecnologie del Web. Il progetto è basato sull'oggetto CANVAS di HTML5. Fa uso di CSS, di JavaScript e del protocollo dati JSON.
 
 ## TEAM
-- <a href="http://giovanniariutti.blogspot.it/" alt="Givanni Ariutti" target="_blank">Giovanni Ariutti</a> - per quanto riguarda la parte grafica;
+- <a href="https://www.facebook.com/pages/Art-of-Giovanni-Ariutti/442721242537449?fref=ts" alt="Givanni Ariutti" target="_blank">Giovanni Ariutti</a> - per quanto riguarda la parte grafica;
 - <a href="http://www.limulo.net/it/templates/info.php" alt="Nicola Ariutti" target="_blank">Nicola Ariutti</a> - per quanto riguarda la programmazione;
 
 ## NOTE
@@ -20,7 +20,7 @@ Sono stati fatti anche tanti altri ragionamenti, come:
 - studio sul colori che caratterizzano il cielo e i vari elementi del paesaggio durante il corso della giornata;
 - dispositivo che misura lo scorrere del tempo a cui è associato un controllo di velocità variabile tale da permettere effetti di avanzamento veloce nel tempo o, addirittura, scorrimento del tempo in senso inverso;
 - integrazione di valori numerici decimali nel cosro del tempo;
-etc…
+etc...
 
 
 
