@@ -1,4 +1,5 @@
 #files da ignorare
 data/
+fonts/
 .project
 .settings/

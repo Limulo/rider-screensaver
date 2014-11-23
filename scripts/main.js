@@ -1499,12 +1499,12 @@ var main = (function() {
 	var framecounter;
 	var orologio;
 	var warpAmount = 967.574; // float
-	var warp = 2000; //2000.0; // float
+	var warp = 250; //2000.0; // float
 
 	var cavaliere;
 	var livelli = [];
 	
-	var velFactor = 0.95; 	// (float)
+	var velFactor = 0.97; 	// (float)
 	var velActor = -240;	// (int)
 	var velCam;				// (int)
 	var velActorApparent;	// (int)
@@ -1523,6 +1523,7 @@ var main = (function() {
 			windowResize();
 		}, false);
 		
+		/*
 		window.addEventListener("keydown", function(e) {
 			e.preventDefault();
 			var code = e.keyCode;
@@ -1550,6 +1551,7 @@ var main = (function() {
 			var code = e.keyCode;
 			//do nothing
 		}, false);
+		*/
 		
 		if( !window.requestAnimationFrame ) {
 			alert("Sorry! your browser doesn't sopport 'requestAnimationFrame' technology :(\nTry Firefox instead!");
@@ -1652,7 +1654,7 @@ var main = (function() {
 		loadImgFromJson("data/02_orari.json"); 
 		loadImgFromJson("data/03_orari.json");
 		//loadImgFromJson("data/sovra.json" );
-		loadImgFromJson("data/spritesheet.json");
+		loadImgFromJson("data/cavaliere.json");
 	}
 	
 	
@@ -1695,7 +1697,7 @@ var main = (function() {
 		// ATTORI *******************************************************
 		var actorPos = [160, 120];
 		cavaliere = new Actor();
-		cavaliere.init("data/spritesheet.json", imgCache["data/spritesheet.json"], imgW, imgH, actorPos, mainPal);
+		cavaliere.init("data/cavaliere.json", imgCache["data/cavaliere.json"], imgW, imgH, actorPos, mainPal);
 		mainPal.setNextFreeColor(249, 0, 249);
 		cavaliere.setVel( velActorApparent );
 

@@ -1,0 +1,8 @@
+@font-face {
+    font-family: "pixel";
+    font-weight: normal;
+    font-style: normal;
+    src: url("../fonts/04b_03/04b_03.ttf") format("truetype"),
+         url("../fonts/04b_03/04b_03.woff") format("woff");
+            
+}

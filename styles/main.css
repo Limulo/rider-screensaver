@@ -10,7 +10,8 @@ body {
     margin: 0;
     padding: 0;
     border: 0;
-    font-size: 20px;  
+    font-family: pixel;
+    font-size: 24px;  
 }
 
 #game-container {
@@ -32,7 +33,7 @@ canvas {
 	margin: 2px;
 	
 	font-size: .4em;
-	font-family: "Courier", sans-serif;
+	/*font-family: "Courier", sans-serif;*/
 	padding: 2px;
 	float: left;
 	width: 16em;
@@ -88,7 +89,7 @@ canvas {
 
 .credits {
 	color: rgb(100, 100, 100);
-	font-family: "Courier", sans-serif;
+	/*font-family: "Courier", sans-serif;*/
 	font-size: 0.7em;
 	padding: 1em;
 }
