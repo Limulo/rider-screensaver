@@ -16,7 +16,8 @@ body {
 
 #game-container {
 	/*border: 1px solid rgb(0, 255, 0);*/
-	display: table-cell;
+	/*display: table-cell;*/
+	width: 100%;
 	vertical-align: bottom;
 	text-align: center;
 }
@@ -24,7 +25,6 @@ body {
 canvas {
     /*border: 1px solid rgb(0, 0, 255);*/
     /*margin: auto;*/
-    margin: 0px;
 }
 
 .palette {
@@ -32,7 +32,7 @@ canvas {
 	background-color: rgb(200, 200, 200);
 	margin: 2px;
 	
-	font-size: .4em;
+	font-size: .35em;
 	/*font-family: "Courier", sans-serif;*/
 	padding: 2px;
 	float: left;
@@ -88,10 +88,12 @@ canvas {
 }
 
 .credits {
+	/*border: 1px solid rgb(255, 0, 0);*/
 	color: rgb(100, 100, 100);
 	/*font-family: "Courier", sans-serif;*/
 	font-size: 0.7em;
 	padding: 1em;
+	text-align: center;
 }
 
 a {

@@ -1,0 +1,31 @@
+Lone Knight is the first videogame experiment made by XX YY inspired by M F and T & A S works in order to take part to the itch.io FTJ.
+Tech notes
+Lone Knight is a web app that takes adv.. of the html 5 canvas object strength. Like the old '80 and '90 s videogames, the indexed colors and palette shifting techniques are implemented.
+
+The artwork has been made by G on the basis of an old flash animation project. The images have been converted in pixel art paintings using Aseprite. 
+The code has been written by N.
+
+The very first videogame version resolution is 320x240 pixels, with a pseudocolor palette with 256 colors.
+
+Game assets:
+- 1 spriteshhet with 12 knight animation sprites. This describes the main game element animation.
+- 4 files describing the 4 parallax elements.
+
+The images are converted in JSON, so they can be parsed by the JS code.
+This conversion has been also useful to include in the same element file different information regarding the local pseudocolor palettes (8 for each element).
+
+Here's a snippet of a JSOn file used in the game:
+XXX
+
+PALETTE SHIFTING
+As time goes by, every color in the main pse… palette is given as the interpolation between the different local palettes corresponding colors.
+Every local pse… palette entry represent  one of the element colors at a given hour of the day. 
+Entry 0 is always the key color.
+
+here's an example:
+XXX
+
+Thus, thanks to this technique, every pixels is colored with the appropriate nuance according to the time flow.
+
+Future improvements
+As an homage to the old videogames, the next improvement will be the introduction of the color cycling feature.

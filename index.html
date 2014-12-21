@@ -2,29 +2,72 @@
 <html lang="it">
 
 <head>
-<meta charset="UTF-8">
-<title>Rider screen saver</title>
-<link rel="stylesheet" href="styles/fontfaces.css">
-<link rel="stylesheet" href="styles/main.css">
-<script src="scripts/main.js"></script>
+	<meta charset="UTF-8">
+	<title>lone knight WebGL</title>
+	<link rel="stylesheet" href="styles/fontfaces.css">
+	<link rel="stylesheet" href="styles/main.css">
+	<script src="scripts/main.js"></script>
+	
+	<script id="vshader" type="x-shader/x-vertex">
+    	attribute vec4 a_position;
+    	varying vec2 v_texcoord;
+    	void main() {
+      		gl_Position = a_position;
+      		v_texcoord = ( (a_position.xy*vec2(1.0, -1.0) )*0.5 + 0.5);
+    	}    
+	</script>
+
+	<script id="fshader" type="x-shader/x-fragment">
+		precision mediump float;
+		varying vec2 v_texcoord;
+		uniform sampler2D u_image;
+		uniform sampler2D u_palette;
+        
+		void main() {
+    		float index = texture2D(u_image, v_texcoord).a;
+    		gl_FragColor = texture2D(u_palette, vec2(index, 0.5));
+		}
+	</script>
+	
 </head>
 
 <body>
-<!-- <h1>traduzione dello sketch di Processing in HTML5</h1> -->
-<div class="credits">
-	<b>Lone Knight</b> screen saver - a web based contemplative game created by two brothers.<br/>
-	graphic art by <b><a href="https://www.facebook.com/pages/Art-of-Giovanni-Ariutti/442721242537449?fref=ts" target="_blank">Giovanni Ariutti</a></b>, programming art by <b><a href="http://www.limulo.net/" target="_blank">Nicola Ariutti</a>.</b>
-    <br/>
-    read <b><a href="http://www.limulo.net/it/templates/lone-knight-focus.php" target="_blank">more</a>!</b>
-</div>
+	<div class="credits">
+		<b>Lone Knight</b> screen saver - a web based contemplative game created by two brothers.
+	</div>
+	<div id="game-container"></div>
+	
+	<div class="credits">
+		graphic art by <b><a href="https://www.facebook.com/pages/Art-of-Giovanni-Ariutti/442721242537449?fref=ts" target="_blank">Giovanni Ariutti</a></b>, programming art by <b><a href="http://www.limulo.net/" target="_blank">Nicola Ariutti</a>.</b>
+    	read <b><a href="http://www.limulo.net/it/templates/lone-knight-focus.php" target="_blank">more</a>!</b><br/>
+    	<div style="display: inline-table;">
+			<ul style="text-align: left;">
+    		<li>press 'f' to show/hide framecounter</li>
+    		<li>press 'p' to show/hide all local pseudocolor palettes</li>
+    		</ul>
+		</div>
+	</div>
+	
+	<div style="text-align: center; width: 100%;">
+	
+	</div>
 
-<div id="game-container"></div>
-
-<script>
-	window.addEventListener("load", function() {
-			main.init();
-		}, false);
-</script>
+	<script>
+		window.addEventListener("load", function() {
+				// sono 9 gli scripts che devo caricare 
+				// l'unica funzione di callback che devo registrare
+				// è la funzione 'init'
+				main.load( "scripts/utility.js", main.init );
+				main.load( "scripts/Integrale.js");
+				main.load( "scripts/Orologio.js");
+				main.load( "scripts/Sprite.js");
+				main.load( "scripts/Palette.js");
+				main.load( "scripts/Parallax.js");
+				main.load( "scripts/Actor.js");
+				main.load( "scripts/Costume.js");
+				main.load( "scripts/Framecount.js");
+			}, false);
+	</script>
 </body>
 
 </html>
