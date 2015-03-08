@@ -12,8 +12,6 @@ var main = (function() {
 		if( p == 100){
 			var progress = document.getElementsByClassName("progress")[0];
 			progress.style.display = "none";
-		} else {	
-			window.setTimeout(checkProgress, 30);
 		}
 	}
 	
@@ -469,11 +467,11 @@ var main = (function() {
 		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
 		
 		// per visualizzare lo stato di progressione del loading risorse
-		if(bDebug) console.log("INIT: creo la barra di progressione per monitorare il caricamento delle risorse");
-		var progress = document.createElement("div");
-		progress.className = "progress";
-		progress.innerHTML = '<div class="indicator"></div>';
-		div.appendChild(progress);
+		//if(bDebug) console.log("INIT: creo la barra di progressione per monitorare il caricamento delle risorse");
+		//var progress = document.createElement("div");
+		//progress.className = "progress";
+		//progress.innerHTML = '<div class="indicator"></div>';
+		//div.appendChild(progress);
 		
 		// CALCOLI VARI **************************************************
 		velCam = main.utility.int(velFactor * velActor);
@@ -505,20 +503,27 @@ var main = (function() {
 		if (bDebug) console.log("INIT: creo il FRAMECOUNTER");
 		framcounter = new (main.Framecount)();		
 		
+		
 		if (bDebug) console.log("INIT: carico le risorse dai files JSON\n");
-		loadImgFromJson("data/00_orari.json", checkProgress );
-		loadImgFromJson("data/01_orari.json", setup );		
+		
+		intervaID = window.setInterval(checkProgress, 30);
+		
+		loadImgFromJson("data/00_orari.json", setup );
+		loadImgFromJson("data/01_orari.json");		
 		loadImgFromJson("data/02_orari.json"); 
 		loadImgFromJson("data/03_orari.json");
 		//loadImgFromJson("data/sovra.json" );
 		loadImgFromJson("data/cavaliere.json");
 	}
 	
+	var intervalID;
 	
 	// SETUP /////////////////////////////////////////////////////////////
 	function setup() {
+		window.clearInterval( intervalID );
+		
 		if (bDebug) console.log("SETUP: carico le risorse dai files JSON\n");
-		// NOTA: nel chiamare il metodo init per il PARALLASSE o p er l'ATTORE
+		// NOTA: nel chiamare il metodo init per il PARALLASSE o per l'ATTORE
 		// sto anche provvedendo alla creazione dei rispettivi elementi di interfaccia 
 		// quali, ad esempio, i riquadri che si occuperanno di mostrare le varie LOCPALS 
 		
@@ -547,7 +552,7 @@ var main = (function() {
 		cavaliere = new (main.Actor)("data/cavaliere.json", imgCache["data/cavaliere.json"], imgW, imgH, actorPos, mainPal);
 		mainPal.setNextFreeColor(249, 0, 249);
 
-		// Setup a palette.
+		// Setup a palette
 		// make palette texture and upload palette
 		gl.activeTexture(gl.TEXTURE0);
 		var mainPal_Tex = gl.createTexture();
