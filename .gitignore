@@ -1,5 +1,5 @@
 #files da ignorare
-data/
-fonts/
+#data/
+#fonts/
 .project
 .settings/
